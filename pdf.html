@@ -3,51 +3,359 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Viewer</title>
+  <title>PDF Text Extractor</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+    :root {
+      --bg: #0f0f0f;
+      --surface: #1a1a1a;
+      --border: #2a2a2a;
+      --accent: #e8ff5a;
+      --accent-dim: #b8cc3a;
+      --text: #e8e8e8;
+      --text-muted: #666;
+      --danger: #ff5a5a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 28px;
+      gap: 16px;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    input[type="url"] {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input[type="url"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="url"]::placeholder {
+      color: var(--text-muted);
+    }
+
+    button {
+      background: var(--accent);
+      color: #0f0f0f;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 22px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+
+    button:hover { background: var(--accent-dim); }
+    button:active { transform: scale(0.97); }
+    button:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      min-height: 20px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .status-dot.loading {
+      background: var(--accent);
+      animation: pulse 0.8s ease-in-out infinite alternate;
+    }
+
+    .status-dot.done { background: #5aff8a; }
+    .status-dot.error { background: var(--danger); }
+
+    @keyframes pulse {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    .output-wrapper {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .output-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .char-count {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    textarea {
+      flex: 1;
+      width: 100%;
+      min-height: 60vh;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 18px;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: #333; }
+
+    .copy-btn {
+      position: absolute;
+      top: 34px;
+      right: 10px;
+      background: #222;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 11px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); background: #222; }
+
+    .progress-bar {
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-left: 2px solid var(--border);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .note strong { color: var(--accent); font-weight: 500; }
+  </style>
 </head>
 <body>
-  <form>
-    <input type="url" placeholder="Enter any PDF URL" id="url" style="width:80vw" value="https://bitcoin.org/bitcoin.pdf">
-    <input type="button" value="Show content" onclick="loadPDF()">
-    <br>
-    <textarea style="width:80vw;height:80vh" id="output"></textarea>
-  </form>
 
-  <script>
-    function loadPDF() {
-      var url = document.getElementById('url').value;
-      getContent(url, function(content) {
-        document.getElementById('output').value = content;
-      });
-    }
+<header>
+  <div class="logo">PDF <span>/</span> Text</div>
+</header>
 
-    function getContent(url, callback) {
-      var embed = document.createElement('embed');
-      embed.type = 'application/pdf';  // Set the correct MIME type for PDF
-      embed.src = url;                 // Use the PDF URL directly
-      embed.style.width = '100%';
-      embed.style.height = '600px';    // Adjust the height as needed
-      document.body.appendChild(embed);
+<main>
+  <div class="input-row">
+    <input type="url" id="url" placeholder="https://..." value="https://bitcoin.org/bitcoin.pdf">
+    <button id="loadBtn" onclick="loadPDF()">Ekstrak Teks</button>
+  </div>
 
-      embed.onload = function() {
-        // You may add additional logic here if needed
-        // For example, you can try to access the content via postMessage
-        // However, note that this might not work in all environments
-        // and may require special handling by the PDF viewer.
-        embed.postMessage({ type: 'selectAll' });
-        embed.postMessage({ type: 'getSelectedText' });
+  <div class="note">
+    <strong>Catatan:</strong> PDF harus mengizinkan akses lintas domain (CORS). Jika gagal, coba unduh PDF-nya dulu lalu unggah lewat tombol di bawah, atau gunakan URL dari server yang sama.
+    &nbsp;|&nbsp; <label style="cursor:pointer;color:var(--accent)">📁 Upload PDF lokal <input type="file" accept="application/pdf" id="fileInput" style="display:none" onchange="loadFile(this)"></label>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot" id="dot"></div>
+    <span id="statusText">Siap</span>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="output-wrapper">
+    <div class="output-label">
+      <span>Output Teks</span>
+      <span class="char-count" id="charCount">0 karakter</span>
+    </div>
+    <textarea id="output" placeholder="Teks PDF akan muncul di sini..."></textarea>
+    <button class="copy-btn" onclick="copyText()">Salin</button>
+  </div>
+</main>
+
+<script>
+  // Set workerSrc for PDF.js
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const dot = document.getElementById('dot');
+  const statusText = document.getElementById('statusText');
+  const progressFill = document.getElementById('progressFill');
+  const output = document.getElementById('output');
+  const charCount = document.getElementById('charCount');
+  const loadBtn = document.getElementById('loadBtn');
+
+  function setStatus(state, msg) {
+    dot.className = 'status-dot' + (state ? ' ' + state : '');
+    statusText.textContent = msg;
+  }
+
+  function setProgress(pct) {
+    progressFill.style.width = pct + '%';
+  }
+
+  async function extractText(source) {
+    loadBtn.disabled = true;
+    output.value = '';
+    charCount.textContent = '0 karakter';
+    setProgress(0);
+    setStatus('loading', 'Memuat PDF...');
+
+    try {
+      const loadingTask = pdfjsLib.getDocument(source);
+
+      loadingTask.onProgress = (p) => {
+        if (p.total) {
+          const pct = Math.round((p.loaded / p.total) * 40);
+          setProgress(pct);
+          setStatus('loading', `Mengunduh... ${pct}%`);
+        }
       };
 
-      window.addEventListener('message', onMessage);
+      const pdf = await loadingTask.promise;
+      const totalPages = pdf.numPages;
+      setStatus('loading', `Membaca ${totalPages} halaman...`);
 
-      function onMessage(event) {
-        if (event.data.type === 'getSelectedTextReply') {
-          window.removeEventListener('message', onMessage);
-          embed.remove();
-          callback(event.data.selectedText || 'No text received');
-        }
+      let fullText = '';
+
+      for (let i = 1; i <= totalPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const pageText = content.items.map(item => item.str).join(' ');
+        fullText += `\n\n--- Halaman ${i} ---\n\n` + pageText;
+
+        const pct = 40 + Math.round((i / totalPages) * 60);
+        setProgress(pct);
+        setStatus('loading', `Halaman ${i} / ${totalPages}`);
       }
+
+      output.value = fullText.trim();
+      charCount.textContent = fullText.trim().length.toLocaleString('id') + ' karakter';
+      setProgress(100);
+      setStatus('done', `Selesai — ${totalPages} halaman diekstrak`);
+    } catch (err) {
+      setStatus('error', 'Gagal: ' + (err.message || 'Error tidak diketahui'));
+      output.value = '⚠️ Error: ' + err.message +
+        '\n\nKemungkinan penyebab:\n• Server PDF memblokir akses CORS\n• URL tidak valid\n• File bukan PDF valid';
+      setProgress(0);
+    } finally {
+      loadBtn.disabled = false;
     }
-  </script>
+  }
+
+  async function loadPDF() {
+    const url = document.getElementById('url').value.trim();
+    if (!url) { setStatus('error', 'URL tidak boleh kosong'); return; }
+    await extractText(url);
+  }
+
+  async function loadFile(input) {
+    if (!input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const typedArray = new Uint8Array(e.target.result);
+      await extractText({ data: typedArray });
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function copyText() {
+    const val = output.value;
+    if (!val) return;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Tersalin!';
+      setTimeout(() => btn.textContent = 'Salin', 1500);
+    });
+  }
+</script>
 </body>
 </html>
