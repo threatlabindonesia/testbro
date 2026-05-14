@@ -17,10 +17,9 @@
       --text: #e8e8e8;
       --text-muted: #666;
       --danger: #ff5a5a;
+      --ok: #5aff8a;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       background: var(--bg);
       color: var(--text);
@@ -29,15 +28,13 @@
       display: flex;
       flex-direction: column;
     }
-
     header {
       border-bottom: 1px solid var(--border);
-      padding: 18px 28px;
+      padding: 16px 24px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
-
     .logo {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 13px;
@@ -46,56 +43,38 @@
       color: var(--accent);
       text-transform: uppercase;
     }
-
-    .logo span {
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
+    .logo span { color: var(--text-muted); font-weight: 400; }
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 28px;
-      gap: 16px;
+      padding: 24px;
+      gap: 14px;
       max-width: 1100px;
       width: 100%;
       margin: 0 auto;
     }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: stretch;
-    }
-
+    .input-row { display: flex; gap: 10px; align-items: stretch; }
     input[type="url"] {
       flex: 1;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 12px 16px;
+      padding: 11px 15px;
       color: var(--text);
       font-family: 'IBM Plex Mono', monospace;
       font-size: 13px;
       outline: none;
       transition: border-color 0.15s;
     }
-
-    input[type="url"]:focus {
-      border-color: var(--accent);
-    }
-
-    input[type="url"]::placeholder {
-      color: var(--text-muted);
-    }
-
+    input[type="url"]:focus { border-color: var(--accent); }
+    input[type="url"]::placeholder { color: var(--text-muted); }
     button {
       background: var(--accent);
       color: #0f0f0f;
       border: none;
       border-radius: 6px;
-      padding: 12px 22px;
+      padding: 11px 20px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 12px;
       font-weight: 600;
@@ -105,10 +84,28 @@
       transition: background 0.15s, transform 0.1s;
       white-space: nowrap;
     }
-
     button:hover { background: var(--accent-dim); }
     button:active { transform: scale(0.97); }
-    button:disabled { background: #333; color: #666; cursor: not-allowed; transform: none; }
+    button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; transform: none; }
+
+    .method-strip {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+    }
+    .method-badge {
+      padding: 3px 9px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .method-badge.active  { border-color: var(--accent); color: var(--accent); background: rgba(232,255,90,0.07); }
+    .method-badge.done    { border-color: var(--ok); color: var(--ok); background: rgba(90,255,138,0.07); }
+    .method-badge.fail    { border-color: #333; color: #444; text-decoration: line-through; }
+    .method-sep { color: var(--border); }
 
     .status-bar {
       display: flex;
@@ -117,37 +114,20 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 12px;
       color: var(--text-muted);
-      min-height: 20px;
+      min-height: 18px;
     }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--text-muted);
-      flex-shrink: 0;
-    }
-
-    .status-dot.loading {
-      background: var(--accent);
-      animation: pulse 0.8s ease-in-out infinite alternate;
-    }
-
-    .status-dot.done { background: #5aff8a; }
-    .status-dot.error { background: var(--danger); }
-
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+    .status-dot.loading { background: var(--accent); animation: pulse 0.8s ease-in-out infinite alternate; }
+    .status-dot.done    { background: var(--ok); }
+    .status-dot.error   { background: var(--danger); }
     @keyframes pulse {
-      from { opacity: 1; transform: scale(1); }
-      to { opacity: 0.4; transform: scale(0.7); }
+      from { opacity:1; transform:scale(1); }
+      to   { opacity:0.4; transform:scale(0.7); }
     }
+    .progress-bar { height: 2px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
 
-    .output-wrapper {
-      flex: 1;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-
+    .output-wrapper { flex:1; position:relative; display:flex; flex-direction:column; }
     .output-label {
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
@@ -159,71 +139,48 @@
       justify-content: space-between;
       align-items: center;
     }
-
-    .char-count {
-      color: var(--text-muted);
-      font-size: 11px;
-    }
-
     textarea {
       flex: 1;
       width: 100%;
-      min-height: 60vh;
+      min-height: 55vh;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 18px;
+      padding: 16px;
       color: var(--text);
       font-family: 'IBM Plex Mono', monospace;
       font-size: 13px;
       line-height: 1.7;
       resize: vertical;
       outline: none;
-      transition: border-color 0.15s;
     }
-
-    textarea:focus { border-color: #333; }
-
     .copy-btn {
       position: absolute;
-      top: 34px;
-      right: 10px;
-      background: #222;
+      top: 34px; right: 10px;
+      background: #1e1e1e;
       color: var(--text-muted);
-      padding: 6px 12px;
+      padding: 5px 11px;
       font-size: 11px;
       border-radius: 4px;
       border: 1px solid var(--border);
-      transition: color 0.15s, border-color 0.15s;
     }
-
-    .copy-btn:hover { color: var(--accent); border-color: var(--accent); background: #222; }
-
-    .progress-bar {
-      height: 2px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      transition: width 0.3s ease;
-    }
+    .copy-btn:hover { color: var(--accent); border-color: var(--accent); background: #1e1e1e; }
 
     .note {
       font-size: 12px;
       color: var(--text-muted);
-      line-height: 1.5;
-      padding: 10px 14px;
+      line-height: 1.6;
+      padding: 9px 13px;
       background: var(--surface);
       border-left: 2px solid var(--border);
       border-radius: 0 4px 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
     }
-
     .note strong { color: var(--accent); font-weight: 500; }
+    label.upload { cursor:pointer; color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:11px; }
   </style>
 </head>
 <body>
@@ -234,26 +191,33 @@
 
 <main>
   <div class="input-row">
-    <input type="url" id="url" placeholder="https://..." value="https://bitcoin.org/bitcoin.pdf">
-    <button id="loadBtn" onclick="loadPDF()">Ekstrak Teks</button>
+    <input type="url" id="url" placeholder="https://example.com/file.pdf" value="https://bitcoin.org/bitcoin.pdf">
+    <button id="loadBtn" onclick="startExtract()">Ekstrak</button>
   </div>
 
   <div class="note">
-    <strong>Catatan:</strong> PDF harus mengizinkan akses lintas domain (CORS). Jika gagal, coba unduh PDF-nya dulu lalu unggah lewat tombol di bawah, atau gunakan URL dari server yang sama.
-    &nbsp;|&nbsp; <label style="cursor:pointer;color:var(--accent)">📁 Upload PDF lokal <input type="file" accept="application/pdf" id="fileInput" style="display:none" onchange="loadFile(this)"></label>
+    <span><strong>Fallback otomatis:</strong> Direct → CORS Proxy → Claude API</span>
+    <label class="upload">📁 Upload lokal <input type="file" accept="application/pdf" style="display:none" onchange="loadFile(this)"></label>
+  </div>
+
+  <div class="method-strip">
+    <div class="method-badge" id="b1">① Direct</div>
+    <span class="method-sep">→</span>
+    <div class="method-badge" id="b2">② CORS Proxy</div>
+    <span class="method-sep">→</span>
+    <div class="method-badge" id="b3">③ Claude API</div>
   </div>
 
   <div class="status-bar">
     <div class="status-dot" id="dot"></div>
     <span id="statusText">Siap</span>
   </div>
-
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 
   <div class="output-wrapper">
     <div class="output-label">
       <span>Output Teks</span>
-      <span class="char-count" id="charCount">0 karakter</span>
+      <span id="charCount">0 karakter</span>
     </div>
     <textarea id="output" placeholder="Teks PDF akan muncul di sini..."></textarea>
     <button class="copy-btn" onclick="copyText()">Salin</button>
@@ -261,101 +225,217 @@
 </main>
 
 <script>
-  // Set workerSrc for PDF.js
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  const dot = document.getElementById('dot');
-  const statusText = document.getElementById('statusText');
-  const progressFill = document.getElementById('progressFill');
-  const output = document.getElementById('output');
-  const charCount = document.getElementById('charCount');
-  const loadBtn = document.getElementById('loadBtn');
+const dot          = document.getElementById('dot');
+const statusText   = document.getElementById('statusText');
+const progressFill = document.getElementById('progressFill');
+const output       = document.getElementById('output');
+const charCount    = document.getElementById('charCount');
+const loadBtn      = document.getElementById('loadBtn');
+const b1 = document.getElementById('b1');
+const b2 = document.getElementById('b2');
+const b3 = document.getElementById('b3');
 
-  function setStatus(state, msg) {
-    dot.className = 'status-dot' + (state ? ' ' + state : '');
-    statusText.textContent = msg;
+function setStatus(state, msg) {
+  dot.className = 'status-dot' + (state ? ' ' + state : '');
+  statusText.textContent = msg;
+}
+function setProgress(pct) { progressFill.style.width = pct + '%'; }
+function setBadge(el, state) { el.className = 'method-badge ' + state; }
+function resetBadges() { [b1,b2,b3].forEach(b => b.className = 'method-badge'); }
+
+// ── Ekstrak teks dari Uint8Array via PDF.js ───────────────────────────────
+async function pdfBytesToText(bytes, label) {
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const total = pdf.numPages;
+  let full = '';
+  for (let i = 1; i <= total; i++) {
+    const page    = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    full += `\n\n--- Halaman ${i} ---\n\n` + content.items.map(x => x.str).join(' ');
+    setProgress(40 + Math.round((i / total) * 55));
+    setStatus('loading', `${label} — halaman ${i}/${total}`);
   }
+  return full.trim();
+}
 
-  function setProgress(pct) {
-    progressFill.style.width = pct + '%';
-  }
+// ── CORS proxies ──────────────────────────────────────────────────────────
+const PROXIES = [
+  url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+];
 
-  async function extractText(source) {
-    loadBtn.disabled = true;
-    output.value = '';
-    charCount.textContent = '0 karakter';
-    setProgress(0);
-    setStatus('loading', 'Memuat PDF...');
+// ── Method 1: Direct fetch ────────────────────────────────────────────────
+async function tryDirect(url) {
+  setBadge(b1, 'active');
+  setStatus('loading', 'Mencoba fetch langsung...');
+  setProgress(10);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const buf = await res.arrayBuffer();
+  setProgress(40);
+  return new Uint8Array(buf);
+}
 
+// ── Method 2: CORS proxy ──────────────────────────────────────────────────
+async function tryProxy(url) {
+  for (let i = 0; i < PROXIES.length; i++) {
     try {
-      const loadingTask = pdfjsLib.getDocument(source);
+      setBadge(b2, 'active');
+      setStatus('loading', `CORS Proxy ${i+1}/${PROXIES.length}...`);
+      setProgress(10);
+      const res = await fetch(PROXIES[i](url));
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const buf = await res.arrayBuffer();
+      setProgress(40);
+      return new Uint8Array(buf);
+    } catch(e) {
+      if (i === PROXIES.length - 1) throw e;
+    }
+  }
+}
 
-      loadingTask.onProgress = (p) => {
-        if (p.total) {
-          const pct = Math.round((p.loaded / p.total) * 40);
-          setProgress(pct);
-          setStatus('loading', `Mengunduh... ${pct}%`);
-        }
-      };
+// ── Method 3: Claude API ──────────────────────────────────────────────────
+async function tryClaudeAPI(url) {
+  setBadge(b3, 'active');
+  setStatus('loading', 'Mengirim ke Claude API...');
+  setProgress(20);
 
-      const pdf = await loadingTask.promise;
-      const totalPages = pdf.numPages;
-      setStatus('loading', `Membaca ${totalPages} halaman...`);
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      system: `Kamu adalah asisten ekstraktor teks PDF.
+Pengguna memberikan URL PDF. Tugasmu: akses URL tersebut, baca isinya, lalu kembalikan HANYA teks konten dari PDF itu secara lengkap dan terstruktur per halaman.
+Jangan tambahkan komentar, penjelasan, atau preamble. Langsung teks PDF saja.`,
+      messages: [{
+        role: 'user',
+        content: `Fetch dan ekstrak seluruh teks dari PDF ini: ${url}\n\nKembalikan isi teksnya saja, per halaman jika memungkinkan.`
+      }]
+    })
+  });
 
-      let fullText = '';
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
 
-      for (let i = 1; i <= totalPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const pageText = content.items.map(item => item.str).join(' ');
-        fullText += `\n\n--- Halaman ${i} ---\n\n` + pageText;
+  setProgress(80);
+  const data = await res.json();
+  const text = (data.content || [])
+    .filter(b => b.type === 'text')
+    .map(b => b.text)
+    .join('\n');
 
-        const pct = 40 + Math.round((i / totalPages) * 60);
-        setProgress(pct);
-        setStatus('loading', `Halaman ${i} / ${totalPages}`);
+  if (!text.trim()) throw new Error('Respons Claude kosong');
+  return text;
+}
+
+// ── Orchestrator utama ────────────────────────────────────────────────────
+async function startExtract() {
+  const url = document.getElementById('url').value.trim();
+  if (!url) { setStatus('error', 'URL tidak boleh kosong'); return; }
+
+  loadBtn.disabled = true;
+  output.value = '';
+  charCount.textContent = '0 karakter';
+  resetBadges();
+  setProgress(0);
+
+  let text = null;
+  let method = '';
+  let e1msg = '', e2msg = '', e3msg = '';
+
+  // ① Direct
+  try {
+    const bytes = await tryDirect(url);
+    text = await pdfBytesToText(bytes, 'Direct');
+    setBadge(b1, 'done');
+    method = 'Direct';
+  } catch(e1) {
+    e1msg = e1.message;
+    setBadge(b1, 'fail');
+    setStatus('loading', `Direct gagal → coba CORS Proxy...`);
+
+    // ② Proxy
+    try {
+      const bytes = await tryProxy(url);
+      text = await pdfBytesToText(bytes, 'Proxy');
+      setBadge(b2, 'done');
+      method = 'CORS Proxy';
+    } catch(e2) {
+      e2msg = e2.message;
+      setBadge(b2, 'fail');
+      setStatus('loading', `Proxy gagal → coba Claude API...`);
+
+      // ③ Claude API
+      try {
+        text = await tryClaudeAPI(url);
+        setBadge(b3, 'done');
+        method = 'Claude API';
+        setProgress(100);
+      } catch(e3) {
+        e3msg = e3.message;
+        setBadge(b3, 'fail');
+        setStatus('error', 'Semua metode gagal');
+        output.value =
+          `⚠️ Semua metode gagal:\n\n` +
+          `① Direct     : ${e1msg}\n` +
+          `② CORS Proxy : ${e2msg}\n` +
+          `③ Claude API : ${e3msg}\n\n` +
+          `→ Coba upload file PDF langsung via tombol "Upload lokal".`;
+        loadBtn.disabled = false;
+        return;
       }
-
-      output.value = fullText.trim();
-      charCount.textContent = fullText.trim().length.toLocaleString('id') + ' karakter';
-      setProgress(100);
-      setStatus('done', `Selesai — ${totalPages} halaman diekstrak`);
-    } catch (err) {
-      setStatus('error', 'Gagal: ' + (err.message || 'Error tidak diketahui'));
-      output.value = '⚠️ Error: ' + err.message +
-        '\n\nKemungkinan penyebab:\n• Server PDF memblokir akses CORS\n• URL tidak valid\n• File bukan PDF valid';
-      setProgress(0);
-    } finally {
-      loadBtn.disabled = false;
     }
   }
 
-  async function loadPDF() {
-    const url = document.getElementById('url').value.trim();
-    if (!url) { setStatus('error', 'URL tidak boleh kosong'); return; }
-    await extractText(url);
-  }
+  output.value = text;
+  charCount.textContent = text.length.toLocaleString('id') + ' karakter';
+  setProgress(100);
+  setStatus('done', `Selesai via ${method}`);
+  loadBtn.disabled = false;
+}
 
-  async function loadFile(input) {
-    if (!input.files[0]) return;
-    const file = input.files[0];
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      const typedArray = new Uint8Array(e.target.result);
-      await extractText({ data: typedArray });
-    };
-    reader.readAsArrayBuffer(file);
+// ── Upload file lokal ─────────────────────────────────────────────────────
+async function loadFile(input) {
+  if (!input.files[0]) return;
+  loadBtn.disabled = true;
+  output.value = '';
+  charCount.textContent = '0 karakter';
+  resetBadges();
+  setBadge(b1, 'active');
+  setProgress(5);
+  setStatus('loading', 'Membaca file lokal...');
+  try {
+    const buf  = await input.files[0].arrayBuffer();
+    const text = await pdfBytesToText(new Uint8Array(buf), 'Lokal');
+    output.value = text;
+    charCount.textContent = text.length.toLocaleString('id') + ' karakter';
+    setBadge(b1, 'done');
+    setProgress(100);
+    setStatus('done', 'Selesai — file lokal');
+  } catch(e) {
+    setBadge(b1, 'fail');
+    setStatus('error', 'Gagal baca file: ' + e.message);
+    output.value = '⚠️ Gagal: ' + e.message;
   }
+  loadBtn.disabled = false;
+}
 
-  function copyText() {
-    const val = output.value;
-    if (!val) return;
-    navigator.clipboard.writeText(val).then(() => {
-      const btn = document.querySelector('.copy-btn');
-      btn.textContent = 'Tersalin!';
-      setTimeout(() => btn.textContent = 'Salin', 1500);
-    });
-  }
+function copyText() {
+  if (!output.value) return;
+  navigator.clipboard.writeText(output.value).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Tersalin!';
+    setTimeout(() => btn.textContent = 'Salin', 1500);
+  });
+}
 </script>
 </body>
 </html>
