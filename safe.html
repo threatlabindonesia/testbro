@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    .download-link {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-link:hover {
+      background-color: #45a049;
+    }
+
+    .download-link.downloading {
+      background-color: #ffc107;
+      pointer-events: none;
+    }
+
+    .download-link.complete {
+      background-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <a id="A" class="download-link" download="Buffer.bat" href="data:octet/stream;base64,">Download</a>
+<script>
+  var downloadLink = document.getElementById("A");
+  var base64Data = "YWFh".repeat(2800000);
+  downloadLink.href = "data:octet/stream;base64," + base64Data;
+
+  downloadLink.addEventListener("click", function() {
+    downloadLink.classList.add("downloading");
+    downloadLink.innerHTML = "Downloading...";
+
+    setTimeout(function() {
+      downloadLink.classList.remove("downloading");
+      downloadLink.classList.add("complete");
+      downloadLink.innerHTML = "Download Complete! Click to Open";
+    }, 2000); // Menunggu 2 detik sebelum mengubah pesan menjadi "Download Complete! Click to Open"
+  });
+</script>
+</body>
+</html>
