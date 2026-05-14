@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Viewer</title>
+</head>
+<body>
+  <form>
+    <input type="url" placeholder="Enter any PDF URL" id="url" style="width:80vw" value="https://bitcoin.org/bitcoin.pdf">
+    <input type="button" value="Show content" onclick="loadPDF()">
+    <br>
+    <textarea style="width:80vw;height:80vh" id="output"></textarea>
+  </form>
+
+  <script>
+    function loadPDF() {
+      var url = document.getElementById('url').value;
+      getContent(url, function(content) {
+        document.getElementById('output').value = content;
+      });
+    }
+
+    function getContent(url, callback) {
+      var embed = document.createElement('embed');
+      embed.type = 'application/pdf';  // Set the correct MIME type for PDF
+      embed.src = url;                 // Use the PDF URL directly
+      embed.style.width = '100%';
+      embed.style.height = '600px';    // Adjust the height as needed
+      document.body.appendChild(embed);
+
+      embed.onload = function() {
+        // You may add additional logic here if needed
+        // For example, you can try to access the content via postMessage
+        // However, note that this might not work in all environments
+        // and may require special handling by the PDF viewer.
+        embed.postMessage({ type: 'selectAll' });
+        embed.postMessage({ type: 'getSelectedText' });
+      };
+
+      window.addEventListener('message', onMessage);
+
+      function onMessage(event) {
+        if (event.data.type === 'getSelectedTextReply') {
+          window.removeEventListener('message', onMessage);
+          embed.remove();
+          callback(event.data.selectedText || 'No text received');
+        }
+      }
+    }
+  </script>
+</body>
+</html>
