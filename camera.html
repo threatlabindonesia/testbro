@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Camera Permission Demo</title>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1,
+        maximum-scale=1, user-scalable=no"
+    />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        #content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        #cameraPreview {
+            display: none;
+            width: 100%;
+            max-height: 450px;
+            margin-top: 20px;
+            background: black;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        button {
+            margin: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #startButton {
+            background: #0d6efd;
+            color: white;
+        }
+
+        #stopButton {
+            background: #dc3545;
+            color: white;
+        }
+
+        #stopButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const startButton = document.getElementById("startButton");
+            const stopButton = document.getElementById("stopButton");
+            const status = document.getElementById("status");
+            const cameraPreview =
+                document.getElementById("cameraPreview");
+
+            let cameraStream = null;
+
+            startButton.addEventListener("click", async function () {
+                try {
+                    if (!navigator.mediaDevices?.getUserMedia) {
+                        throw new Error(
+                            "Camera API is not supported by this browser."
+                        );
+                    }
+
+                    cameraStream =
+                        await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                facingMode: "user"
+                            },
+                            audio: false
+                        });
+
+                    cameraPreview.srcObject = cameraStream;
+                    cameraPreview.style.display = "block";
+
+                    status.textContent =
+                        "Camera access is active. Video is only shown locally.";
+
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                } catch (error) {
+                    console.error("Camera error:", error);
+
+                    status.textContent =
+                        "Camera access failed: " + error.message;
+                }
+            });
+
+            stopButton.addEventListener("click", function () {
+                if (cameraStream) {
+                    cameraStream
+                        .getTracks()
+                        .forEach((track) => track.stop());
+
+                    cameraStream = null;
+                }
+
+                cameraPreview.srcObject = null;
+                cameraPreview.style.display = "none";
+
+                status.textContent = "Camera access has been stopped.";
+
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            });
+
+            window.addEventListener("beforeunload", function () {
+                if (cameraStream) {
+                    cameraStream
+                        .getTracks()
+                        .forEach((track) => track.stop());
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="content">
+        <div class="container">
+            <h1>Camera Permission Demo</h1>
+
+            <p>
+                Click the button below to request camera access.
+                The video is displayed locally and is not uploaded.
+            </p>
+
+            <button id="startButton" type="button">
+                Enable Camera
+            </button>
+
+            <button id="stopButton" type="button" disabled>
+                Stop Camera
+            </button>
+
+            <div id="status" aria-live="polite">
+                Camera is currently inactive.
+            </div>
+
+            <video
+                id="cameraPreview"
+                autoplay
+                muted
+                playsinline
+            ></video>
+        </div>
+    </div>
+</body>
+</html>
