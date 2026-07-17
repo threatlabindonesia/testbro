@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Microphone Permission Demo</title>
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1,
+        maximum-scale=1, user-scalable=no"
+    />
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        #content {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        button {
+            margin: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #startButton {
+            background: #198754;
+            color: white;
+        }
+
+        #stopButton {
+            background: #dc3545;
+            color: white;
+        }
+
+        #stopButton:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const startButton = document.getElementById("startButton");
+            const stopButton = document.getElementById("stopButton");
+            const status = document.getElementById("status");
+
+            let microphoneStream = null;
+
+            startButton.addEventListener("click", async function () {
+                try {
+                    if (!navigator.mediaDevices?.getUserMedia) {
+                        throw new Error(
+                            "Microphone API is not supported by this browser."
+                        );
+                    }
+
+                    microphoneStream =
+                        await navigator.mediaDevices.getUserMedia({
+                            audio: true,
+                            video: false
+                        });
+
+                    status.textContent =
+                        "Microphone access is active. Audio is not being recorded.";
+
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                } catch (error) {
+                    console.error("Microphone error:", error);
+
+                    status.textContent =
+                        "Microphone access failed: " + error.message;
+                }
+            });
+
+            stopButton.addEventListener("click", function () {
+                if (microphoneStream) {
+                    microphoneStream
+                        .getTracks()
+                        .forEach((track) => track.stop());
+
+                    microphoneStream = null;
+                }
+
+                status.textContent = "Microphone access has been stopped.";
+
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            });
+
+            window.addEventListener("beforeunload", function () {
+                if (microphoneStream) {
+                    microphoneStream
+                        .getTracks()
+                        .forEach((track) => track.stop());
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div id="content">
+        <div class="container">
+            <h1>Microphone Permission Demo</h1>
+
+            <p>
+                Click the button below to request microphone access.
+                This demonstration does not record or upload audio.
+            </p>
+
+            <button id="startButton" type="button">
+                Enable Microphone
+            </button>
+
+            <button id="stopButton" type="button" disabled>
+                Stop Microphone
+            </button>
+
+            <div id="status" aria-live="polite">
+                Microphone is currently inactive.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
